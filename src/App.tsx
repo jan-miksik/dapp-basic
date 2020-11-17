@@ -2,7 +2,8 @@ import "./App.css";
 
 import React, { useEffect, useState } from "react";
 
-import Web3 from "web3";
+import loadBlockchainData from "./handlers/loadBlockchainData";
+import loadWeb3 from "./handlers/loadWeb3";
 
 declare global {
   interface Window {
@@ -15,30 +16,14 @@ function App() {
   const [currentMsg, setCurrentMsg] = useState<string>("");
   const [account, setAccount] = useState("");
 
-  const loadWeb3 = async () => {
-    if (window.ethereum) {
-      window.web3 = new Web3(window.ethereum);
-      console.log("App -> window.web3", window.web3);
-      await window.ethereum.enable();
-    } else if (window.web3) {
-      console.log("App -> window.web3", window.web3);
-      window.web3 = new Web3(window.web3.currentProvider);
-    } else {
-      window.alert(
-        "Non-Ethereum browser detected. You should consider trying MetaMask!"
-      );
-    }
-  };
-
-  const loadBlockchainData = async () => {
-    const web3 = window.web3;
-    const accounts = await web3.eth.getAccounts();
-    setAccount(accounts[0]);
-  };
-
   useEffect(() => {
-    loadBlockchainData();
-    loadWeb3();
+    (async () => {
+      await loadWeb3();
+      const accounts = await loadBlockchainData();
+      if (accounts && accounts.length > 0) {
+        setAccount(accounts[0]);
+      }
+    })();
   }, []);
 
   const handleMsg = (event: any) => {
@@ -59,6 +44,7 @@ function App() {
       {account && `connected account ${account}`}
       <br />
       <br />
+
       <form onSubmit={sendMsg}>
         <input onChange={handleMsg}></input>
         <button onClick={sendMsg}>send message</button>
