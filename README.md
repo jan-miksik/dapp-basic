@@ -1,2 +1,3 @@
 # dapp-basic
-Decentralized application with basic setup. Builded on React, ipfs and ethereum smart contract
+
+"Hellou world" decentralized application(dapp). Builded with React, ipfs and ethereum smart contract

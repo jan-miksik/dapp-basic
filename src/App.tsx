@@ -79,11 +79,11 @@ function App() {
         <br />
         <form onSubmit={sendMsg}>
           <input maxLength={30} onChange={handleMsg}></input>
-          <button onClick={sendMsg}>send contract message</button>
+          <button onClick={sendMsg}>change message</button>
         </form>
         <br />
         <br />
-        <button onClick={getMsg}>get contract message</button>
+        <button onClick={getMsg}>get message</button>
       </div>
     </div>
   );

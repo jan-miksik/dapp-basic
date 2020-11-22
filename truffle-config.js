@@ -27,36 +27,6 @@ module.exports = {
       gasPrice: 25000000000,
       network_id: 42,
     },
-    // ganache_local: {
-    //   provider: function () {
-    //     return new HDWalletProvider(
-    //       `${process.env.MNEMONIC}`,
-    //       'http://127.0.0.1:7545',
-    //       MetaMaskAccountIndex,
-    //     )
-    //   },
-    //   network_id: 5777,
-    // },
-    // goerli_infura: {
-    //   provider: function () {
-    //     return new HDWalletProvider(
-    //       `${process.env.MNEMONIC}`,
-    //       'https://goerli.infura.io/v3/a5c2bfdeeea04325b0a804121cea03f5',
-    //       MetaMaskAccountIndex,
-    //     )
-    //   },
-    //   network_id: 5,
-    // },
-    // ropsten_infura: {
-    //   provider: function () {
-    //     return new HDWalletProvider(
-    //       `${process.env.MNEMONIC}`,
-    //       'https://ropsten.infura.io/v3/a5c2bfdeeea04325b0a804121cea03f5',
-    //       MetaMaskAccountIndex,
-    //     )
-    //   },
-    //   network_id: 3,
-    // },
   },
   compilers: {
     solc: {
