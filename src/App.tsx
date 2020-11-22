@@ -15,13 +15,27 @@ declare global {
 function App() {
   const [currentMsg, setCurrentMsg] = useState<string>("");
   const [account, setAccount] = useState("");
+  const [contract, setContract] = useState<any>();
+  const [contractMsg, setContractMsg] = useState("");
 
   useEffect(() => {
     (async () => {
       await loadWeb3();
-      const accounts = await loadBlockchainData();
+      const loadedContract = await loadBlockchainData();
+      if (!loadedContract) return;
+
+      setContract(loadedContract);
+
+      const web3 = window.web3;
+      const accounts = await web3.eth.getAccounts();
+
       if (accounts && accounts.length > 0) {
         setAccount(accounts[0]);
+      }
+
+      const blockchainMsg = await loadedContract.methods.get().call();
+      if (blockchainMsg) {
+        setContractMsg(blockchainMsg);
       }
     })();
   }, []);
@@ -31,24 +45,46 @@ function App() {
     setCurrentMsg(event.target.value);
   };
 
-  const sendMsg = (event: any) => {
+  const sendMsg = async (event: any) => {
     event.preventDefault();
-    alert(`just test ${currentMsg}`);
+    if (!account || !contract) {
+      alert(`||| account or contract missing |||`);
+      return;
+    }
+    const res = await contract.methods.set(currentMsg).send({ from: account });
+  };
+
+  const getMsg = async () => {
+    if (!contract) return;
+    const msg = await contract.methods.get().call();
+    if (msg) {
+      setContractMsg(msg);
+      return;
+    }
+    alert(`no message ]><[`);
   };
 
   return (
-    <div className="App">
-      <h1>Hellou world dapp on ethereum smart contract and IPFS</h1>
-      <header className="App-header"></header>
-      <h2>short message box</h2>
-      {account && `connected account ${account}`}
-      <br />
-      <br />
-
-      <form onSubmit={sendMsg}>
-        <input onChange={handleMsg}></input>
-        <button onClick={sendMsg}>send message</button>
-      </form>
+    <div className="container">
+      <div className="app">
+        <h2>Hellou world dapp with ethereum smart contract on IPFS</h2>
+        contract message: <br />
+        <b>{contractMsg}</b>
+        <br />
+        <br />
+        connected account:
+        <br />
+        <b>{account}</b>
+        <br />
+        <br />
+        <form onSubmit={sendMsg}>
+          <input maxLength={30} onChange={handleMsg}></input>
+          <button onClick={sendMsg}>send contract message</button>
+        </form>
+        <br />
+        <br />
+        <button onClick={getMsg}>get contract message</button>
+      </div>
     </div>
   );
 }
