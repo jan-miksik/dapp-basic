@@ -13,10 +13,11 @@ declare global {
 }
 
 function App() {
-  const [currentMsg, setCurrentMsg] = useState<string>("");
+  const [msgToSend, setMsgToSend] = useState<string>("");
   const [account, setAccount] = useState("");
   const [contract, setContract] = useState<any>();
   const [contractMsg, setContractMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -40,52 +41,98 @@ function App() {
     })();
   }, []);
 
-  const handleMsg = (event: any) => {
+  const handleMsg = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
-    setCurrentMsg(event.target.value);
+    setMsgToSend(event.target.value);
   };
 
-  const sendMsg = async (event: any) => {
+  const sendMsg = async (
+    event:
+      | React.FormEvent<HTMLFormElement>
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     event.preventDefault();
     if (!account || !contract) {
       alert(`||| account or contract missing |||`);
       return;
     }
-    const res = await contract.methods.set(currentMsg).send({ from: account });
+    setLoading(true);
+    try {
+      const res = await contract.methods
+        .set(msgToSend)
+        .send({ from: account })
+        .on("receipt", function (receipt: any) {
+          console.log("receipt: ", receipt);
+        });
+
+      const blockchainMsg = await contract.methods.get().call();
+      if (blockchainMsg) {
+        setContractMsg(blockchainMsg);
+      }
+      setMsgToSend("");
+      setLoading(false);
+      console.log("res: ", res);
+    } catch (err) {
+      console.log("err: ", err);
+    }
   };
 
-  const getMsg = async () => {
-    if (!contract) return;
-    const msg = await contract.methods.get().call();
-    if (msg) {
-      setContractMsg(msg);
-      return;
-    }
-    alert(`no message ]><[`);
-  };
+  const _title = () => (
+    <h2>
+      Hellou world dapp with ethereum smart contract on IPFS and{" "}
+      <a
+        href="https://kovan.faucet.enjin.io/"
+        target="_blank"
+        rel="noreferrer"
+        title="to get kovan testing ether"
+      >
+        kovan testnet
+      </a>
+    </h2>
+  );
+
+  const _info = () => (
+    <>
+      contract message: <br />
+      <b>{contractMsg}</b>
+      <br />
+      <br />
+      connected account:
+      <br />
+      <b>{account}</b>
+      <br />
+      <br />
+    </>
+  );
+
+  const _form = () => (
+    <form onSubmit={sendMsg}>
+      <input maxLength={30} onChange={handleMsg} value={msgToSend}></input>
+      <button onClick={sendMsg}>change message</button>
+    </form>
+  );
+
+  const _loader = () => (
+    <div>
+      <br />
+      ... waiting for confirmation...
+    </div>
+  );
 
   return (
-    <div className="container">
-      <div className="app">
-        <h2>Hellou world dapp with ethereum smart contract on IPFS</h2>
-        contract message: <br />
-        <b>{contractMsg}</b>
-        <br />
-        <br />
-        connected account:
-        <br />
-        <b>{account}</b>
-        <br />
-        <br />
-        <form onSubmit={sendMsg}>
-          <input maxLength={30} onChange={handleMsg}></input>
-          <button onClick={sendMsg}>change message</button>
-        </form>
-        <br />
-        <br />
-        <button onClick={getMsg}>get message</button>
+    <>
+      <div className="container">
+        <div className="app">
+          <div className="app-content">
+            {_title()}
+            {_info()}
+            {_form()}
+            {loading && _loader()}
+          </div>
+        </div>
+        <div className="app-bottom-space" />
       </div>
-    </div>
+    </>
   );
 }
 

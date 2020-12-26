@@ -1,8 +1,8 @@
 import Message from "../abis/Message.json";
 
-interface Message {
-  networks: any;
-}
+// interface MessageType {
+//   networks: any;
+// }
 
 const loadBlockchainData = async () => {
   const web3 = window.web3;
@@ -18,7 +18,7 @@ const loadBlockchainData = async () => {
     );
     if (contract) return contract;
   } else {
-    window.alert("Smart contract not deployed to detected network.");
+    window.alert("Smart contract unavailable, are you on Kovan network?");
   }
 };
 
